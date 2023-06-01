@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using Cinemachine;
-using Unity.Logging;
 using UnityEngine;
 using UnityEngine.InputSystem;
 

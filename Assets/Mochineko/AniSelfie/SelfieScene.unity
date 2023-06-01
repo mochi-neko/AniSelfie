@@ -284,6 +284,7 @@ MonoBehaviour:
   mocopiReceiver: {fileID: 385909337}
   mocopiPort: 12351
   orbitalCamera: {fileID: 2045465060}
+  capturedImageFilePath: /Users/masaki/Downloads/capture.png
 --- !u!4 &385909336
 Transform:
   m_ObjectHideFlags: 0

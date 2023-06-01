@@ -29,6 +29,9 @@ namespace Mochineko.AniSelfie
         [SerializeField]
         private CinemachineVirtualCamera? orbitalCamera = default;
 
+        [SerializeField]
+        private string capturedImageFilePath = string.Empty;
+        
         private async void Start()
         {
             if (mocopiReceiver == null)
@@ -104,6 +107,33 @@ namespace Mochineko.AniSelfie
             }
 
             mocopiReceiver.StopReceiving();
+        }
+        
+        [ContextMenu(nameof(CaptureImage))]
+        public void CaptureImage()
+        {
+            if (string.IsNullOrEmpty(capturedImageFilePath))
+            {
+                throw new ArgumentException(nameof(capturedImageFilePath));
+            }
+
+            CaptureImageAsync(capturedImageFilePath, this.GetCancellationTokenOnDestroy())
+                .Forget();
+        }
+
+        private async UniTask CaptureImageAsync(string path, CancellationToken cancellationToken)
+        {
+            if (Camera.main == null)
+            {
+                throw new NullReferenceException(nameof(Camera.main));
+            }
+
+            var capturedTexture = CameraCapture.Capture(Camera.main);
+            
+            // TODO: Encode image on a thread pool.
+            var encoded = ImageEncoder.Encode(capturedTexture);
+            
+            await File.WriteAllBytesAsync(path, encoded, cancellationToken);
         }
     }
 }
