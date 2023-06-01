@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using Cinemachine;
 using Cysharp.Threading.Tasks;
 using Mocopi.Receiver;
 using UnityEngine;
@@ -20,10 +21,13 @@ namespace Mochineko.AniSelfie
         private string vrmModelFilePath = string.Empty;
 
         [SerializeField]
-        private MocopiSimpleReceiver? mocopiReceiver = null;
+        private MocopiSimpleReceiver? mocopiReceiver = default;
 
         [SerializeField]
         private int mocopiPort = 12351;
+
+        [SerializeField]
+        private CinemachineVirtualCamera? orbitalCamera = default;
 
         private async void Start()
         {
@@ -31,7 +35,12 @@ namespace Mochineko.AniSelfie
             {
                 throw new NullReferenceException(nameof(mocopiReceiver));
             }
-            
+
+            if (orbitalCamera == null)
+            {
+                throw new NullReferenceException(nameof(orbitalCamera));
+            }
+
             CancellationToken cancellationToken = this.GetCancellationTokenOnDestroy();
 
             if (!File.Exists(vrmModelFilePath))
@@ -46,7 +55,7 @@ namespace Mochineko.AniSelfie
                 Log.Error("[AniSelfie] Failed to read VRM model file at: {0}", vrmModelFilePath);
                 return;
             }
-            
+
             var vrm = await Vrm10.LoadBytesAsync(
                 bytes: bytes,
                 canLoadVrm0X: true,
@@ -77,6 +86,12 @@ namespace Mochineko.AniSelfie
             Log.Info("[AniSelfie] Start receiving mocopi data on port: {0}.", mocopiPort);
 
             mocopiReceiver.StartReceiving();
+
+            Log.Info("[AniSelfie] Setup virtual cameras.");
+
+            var head = vrm.Humanoid.Head.transform;
+            orbitalCamera.Follow = head;
+            orbitalCamera.LookAt = head;
 
             Log.Info("[AniSelfie] AniSelfie started.");
         }
