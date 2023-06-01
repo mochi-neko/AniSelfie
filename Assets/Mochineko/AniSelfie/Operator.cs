@@ -1,7 +1,9 @@
 #nullable enable
+using System;
 using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Mocopi.Receiver;
 using UnityEngine;
 using UniVRM10;
 using VRMShaders;
@@ -17,39 +19,76 @@ namespace Mochineko.AniSelfie
         [SerializeField]
         private string vrmModelFilePath = string.Empty;
 
+        [SerializeField]
+        private MocopiSimpleReceiver? mocopiReceiver = null;
+
+        [SerializeField]
+        private int mocopiPort = 12351;
+
         private async void Start()
         {
+            if (mocopiReceiver == null)
+            {
+                throw new NullReferenceException(nameof(mocopiReceiver));
+            }
+            
+            CancellationToken cancellationToken = this.GetCancellationTokenOnDestroy();
+
             if (!File.Exists(vrmModelFilePath))
             {
-                Log.Error($"VRM model file not found at: {vrmModelFilePath}");
+                Log.Error("[AniSelfie] VRM model file not found at: {0}", vrmModelFilePath);
                 return;
             }
 
-            var bytes = await File.ReadAllBytesAsync(vrmModelFilePath);
+            var bytes = await File.ReadAllBytesAsync(vrmModelFilePath, cancellationToken);
             if (bytes == null)
             {
-                Log.Error($"Failed to read VRM model file at: {vrmModelFilePath}");
+                Log.Error("[AniSelfie] Failed to read VRM model file at: {0}", vrmModelFilePath);
                 return;
             }
-
-            var vrm = await LoadVRMModelAsync(
-                binary: bytes,
-                cancellationToken: this.GetCancellationTokenOnDestroy()
-            );
-
-            Log.Info("VRM model loaded.");
-        }
-
-        private static async UniTask<Vrm10Instance> LoadVRMModelAsync(
-            byte[] binary,
-            CancellationToken cancellationToken)
-            => await Vrm10.LoadBytesAsync(
-                bytes: binary,
+            
+            var vrm = await Vrm10.LoadBytesAsync(
+                bytes: bytes,
                 canLoadVrm0X: true,
                 controlRigGenerationOption: ControlRigGenerationOption.None,
                 showMeshes: true,
                 awaitCaller: new RuntimeOnlyAwaitCaller(),
                 ct: cancellationToken
             );
+
+            Log.Info("[AniSelfie] VRM model loaded from: {0}.", vrmModelFilePath);
+
+            var animator = vrm.transform.GetComponent<Animator>();
+            if (animator == null)
+            {
+                throw new NullReferenceException(nameof(animator));
+            }
+
+            var avatar = animator.gameObject.AddComponent<MocopiAvatar>();
+            mocopiReceiver
+                .AvatarSettings
+                .Add(
+                    new MocopiSimpleReceiver.MocopiSimpleReceiverAvatarSettings(
+                        avatar,
+                        mocopiPort
+                    )
+                );
+
+            Log.Info("[AniSelfie] Start receiving mocopi data on port: {0}.", mocopiPort);
+
+            mocopiReceiver.StartReceiving();
+
+            Log.Info("[AniSelfie] AniSelfie started.");
+        }
+
+        private void OnDestroy()
+        {
+            if (mocopiReceiver == null)
+            {
+                throw new NullReferenceException(nameof(mocopiReceiver));
+            }
+
+            mocopiReceiver.StopReceiving();
+        }
     }
 }
