@@ -31,7 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6035524173373737849
 MonoBehaviour:
@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4deeef336f3f44ce7bc88f5d78efc448, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vrmModelFilePath: /Users/masaki/Documents/artificial_angel.vrm
+  vrmModelFilePath: 
   mocopiReceiver: {fileID: 6736992650521790392}
   mocopiPort: 12351
   orbitalCamera: {fileID: 0}

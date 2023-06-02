@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028326, g: 0.22571333, b: 0.30692202, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -525,6 +525,10 @@ PrefabInstance:
       propertyPath: orbitalCamera
       value: 
       objectReference: {fileID: 2045465060}
+    - target: {fileID: 6035524173373737849, guid: f12dc34fc6b8f4092b7d3725577664e8, type: 3}
+      propertyPath: vrmModelFilePath
+      value: C:/Users/mochineko/Documents/artificial_angel.vrm
+      objectReference: {fileID: 0}
     - target: {fileID: 6697976098862202522, guid: f12dc34fc6b8f4092b7d3725577664e8, type: 3}
       propertyPath: m_RootOrder
       value: 3
