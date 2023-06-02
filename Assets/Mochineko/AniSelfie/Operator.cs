@@ -5,6 +5,7 @@ using System.Threading;
 using Cinemachine;
 using Cysharp.Threading.Tasks;
 using Mocopi.Receiver;
+using UniRx;
 using UnityEngine;
 using UniVRM10;
 using VRMShaders;
@@ -29,6 +30,8 @@ namespace Mochineko.AniSelfie
         [SerializeField]
         private CinemachineVirtualCamera? orbitalCamera = default;
 
+        private InputSettings? inputSettings;
+        
         private async void Start()
         {
             if (mocopiReceiver == null)
@@ -93,6 +96,24 @@ namespace Mochineko.AniSelfie
             orbitalCamera.Follow = head;
             orbitalCamera.LookAt = head;
 
+            inputSettings = new InputSettings();
+            
+            inputSettings
+                .Player
+                .Capture
+                .OnPerformedAsObservable()
+                .Subscribe(_ => CaptureImage())
+                .AddTo(this);
+            
+            inputSettings
+                .Player
+                .CaptureWithDelay
+                .OnPerformedAsObservable()
+                .Subscribe(_ => CaptureImageWithDelay())
+                .AddTo(this);
+            
+            inputSettings.Enable();
+
             Log.Info("[AniSelfie] AniSelfie started.");
         }
 
@@ -104,10 +125,11 @@ namespace Mochineko.AniSelfie
             }
 
             mocopiReceiver.StopReceiving();
+            
+            inputSettings?.Dispose();
         }
-
-        [ContextMenu(nameof(CaptureImage))]
-        public void CaptureImage()
+        
+        private void CaptureImage()
         {
             var camera = Camera.main;
             if (camera == null)
@@ -115,14 +137,15 @@ namespace Mochineko.AniSelfie
                 throw new NullReferenceException(nameof(Camera.main));
             }
             
+            Log.Info("[AniSelfie] Capture image.");
+
             CameraCapture.CaptureCameraAndSaveAsync(
                     camera,
                     this.GetCancellationTokenOnDestroy())
                 .Forget();
         }
         
-        [ContextMenu(nameof(CaptureImage))]
-        public void CaptureImageWithDelay()
+        private void CaptureImageWithDelay()
         {
             var camera = Camera.main;
             if (camera == null)
@@ -130,6 +153,8 @@ namespace Mochineko.AniSelfie
                 throw new NullReferenceException(nameof(Camera.main));
             }
             
+            Log.Info("[AniSelfie] Capture image with delay.");
+
             CameraCapture.CaptureCameraAndSaveAsync(
                     camera,
                     this.GetCancellationTokenOnDestroy(),

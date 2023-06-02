@@ -31,12 +31,12 @@ namespace Mochineko.AniSelfie
 
             // TODO: Encode image on a thread pool.
             var encoded = ImageEncoder.Encode(capturedTexture);
-
+            
             var path = GetSavePath();
 
             await File.WriteAllBytesAsync(path, encoded, cancellationToken);
 
-            Log.Info("[AniSelfie] Capture image saved to path:{0}.", path);
+            Log.Info("[AniSelfie] Capture image saved to the path:{0}.", path);
         }
 
         private static Texture2D Capture(Camera camera)
@@ -81,19 +81,32 @@ namespace Mochineko.AniSelfie
 
         private static string GetSavePath()
         {
-            var directory = Application.isEditor
-                ? Path.Combine(Application.dataPath, "/../Selfies/")
-                : Path.Combine(Application.dataPath, "/Selfies/");
+            var directory = GetOrCreateSaveDirectory();
+            var fileName = GenerateFileName();
+            return Path.Combine(directory, fileName);
+        }
+
+        private static string GetOrCreateSaveDirectory()
+        {
+            var directory = SaveDirectory;
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
             }
 
-            var now = DateTime.Now;
-            var fileName =
-                $"AniSelfie_{now.Year:0000}{now.Month:00}{now.Day:00}_{now.Hour:00}{now.Minute:00}{now.Second:00}_{now.Millisecond:000}.png";
+            return directory;
+        }
 
-            return Path.Combine(directory, fileName);
+        private static string SaveDirectory
+            => Application.isEditor
+                ? Application.dataPath + "/../Selfies/"
+                : Application.dataPath + "/Selfies/";
+
+        private static string GenerateFileName()
+        {
+            var now = DateTime.Now;
+            return
+                $"AniSelfie_{now.Year:0000}{now.Month:00}{now.Day:00}_{now.Hour:00}{now.Minute:00}{now.Second:00}_{now.Millisecond:000}.png";
         }
     }
 }

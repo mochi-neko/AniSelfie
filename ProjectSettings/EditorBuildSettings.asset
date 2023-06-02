@@ -4,5 +4,9 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
-  m_configObjects: {}
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Mochineko/AniSelfie/SelfieScene.unity
+    guid: f905dfb32cdb74957ac0a89c98f63e9d
+  m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 3194713989d544b7c9d4588e9a7f8bfd, type: 2}
