@@ -30,6 +30,9 @@ namespace Mochineko.AniSelfie
         [SerializeField]
         private CinemachineVirtualCamera? orbitalCamera = default;
 
+        [SerializeField]
+        private CinemachineFollowZoom? followZoom = default;
+        
         private InputSettings? inputSettings;
         
         private async void Start()
@@ -42,6 +45,11 @@ namespace Mochineko.AniSelfie
             if (orbitalCamera == null)
             {
                 throw new NullReferenceException(nameof(orbitalCamera));
+            }
+            
+            if (followZoom == null)
+            {
+                throw new NullReferenceException(nameof(followZoom));
             }
 
             CancellationToken cancellationToken = this.GetCancellationTokenOnDestroy();
@@ -111,10 +119,28 @@ namespace Mochineko.AniSelfie
                 .OnPerformedAsObservable()
                 .Subscribe(_ => CaptureImageWithDelay())
                 .AddTo(this);
-            
+
             inputSettings.Enable();
 
             Log.Info("[AniSelfie] AniSelfie started.");
+        }
+
+        private void Update()
+        {
+            if (followZoom == null)
+            {
+                throw new NullReferenceException(nameof(followZoom));
+            }
+            
+            if (inputSettings == null)
+            {
+                return;
+            }
+            
+            followZoom.m_Width += inputSettings
+                .Player
+                .Zoom
+                .ReadValue<float>();
         }
 
         private void OnDestroy()

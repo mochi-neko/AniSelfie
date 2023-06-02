@@ -138,7 +138,7 @@ GameObject:
   - component: {fileID: 7286093587491287416}
   - component: {fileID: 386807211965642891}
   - component: {fileID: 2607743570682142835}
-  - component: {fileID: 1193402496201268026}
+  - component: {fileID: 1584068262714294497}
   m_Layer: 0
   m_Name: OrbitalVirtualCamera
   m_TagString: Untagged
@@ -217,7 +217,7 @@ MonoBehaviour:
   AutoEnableInputs: 1
   XYAxis: {fileID: -5630151704836100654, guid: 8e3b575f0ea2d4d319ff7f2ecfcd8105, type: 3}
   ZAxis: {fileID: 0}
---- !u!114 &1193402496201268026
+--- !u!114 &1584068262714294497
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -226,10 +226,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5283476198785853817}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 634f5d77b9b24d45b7ae73c4f7c08b82, type: 3}
+  m_Script: {fileID: 11500000, guid: 4700f9f03ad19f94baf0367cb7a9c988, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionReference: {fileID: 7428529295715101891, guid: 8e3b575f0ea2d4d319ff7f2ecfcd8105, type: 3}
-  scale: 0.1
-  minFOV: 10
-  maxFOV: 90
+  m_Width: 2
+  m_Damping: 1
+  m_MinFOV: 3
+  m_MaxFOV: 60
