@@ -109,44 +109,32 @@ namespace Mochineko.AniSelfie
         [ContextMenu(nameof(CaptureImage))]
         public void CaptureImage()
         {
-            CaptureCameraAndSaveAsync(this.GetCancellationTokenOnDestroy())
-                .Forget();
-        }
-
-        private static async UniTask CaptureCameraAndSaveAsync(CancellationToken cancellationToken)
-        {
-            if (Camera.main == null)
+            var camera = Camera.main;
+            if (camera == null)
             {
                 throw new NullReferenceException(nameof(Camera.main));
             }
-
-            var capturedTexture = CameraCapture.Capture(Camera.main);
-
-            // TODO: Encode image on a thread pool.
-            var encoded = ImageEncoder.Encode(capturedTexture);
-
-            var path = GetSavePath();
             
-            await File.WriteAllBytesAsync(path, encoded, cancellationToken);
-            
-            Log.Info("[AniSelfie] Capture image saved to path:{0}.", path);
+            CameraCapture.CaptureCameraAndSaveAsync(
+                    camera,
+                    this.GetCancellationTokenOnDestroy())
+                .Forget();
         }
-
-        private static string GetSavePath()
+        
+        [ContextMenu(nameof(CaptureImage))]
+        public void CaptureImageWithDelay()
         {
-            var directory = Application.isEditor
-                ? Path.Combine(Application.dataPath, "/../Selfies/")
-                : Path.Combine(Application.dataPath, "/Selfies/");
-            if (!Directory.Exists(directory))
+            var camera = Camera.main;
+            if (camera == null)
             {
-                Directory.CreateDirectory(directory);
+                throw new NullReferenceException(nameof(Camera.main));
             }
-
-            var now = DateTime.Now;
-            var fileName =
-                $"AniSelfie_{now.Year:0000}{now.Month:00}{now.Day:00}_{now.Hour:00}{now.Minute:00}{now.Second:00}_{now.Millisecond:000}.png";
-
-            return Path.Combine(directory, fileName);
+            
+            CameraCapture.CaptureCameraAndSaveAsync(
+                    camera,
+                    this.GetCancellationTokenOnDestroy(),
+                    delay: TimeSpan.FromSeconds(5f))
+                .Forget();
         }
     }
 }
