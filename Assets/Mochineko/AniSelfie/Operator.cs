@@ -29,9 +29,6 @@ namespace Mochineko.AniSelfie
         [SerializeField]
         private CinemachineVirtualCamera? orbitalCamera = default;
 
-        [SerializeField]
-        private string capturedImageFilePath = string.Empty;
-        
         private async void Start()
         {
             if (mocopiReceiver == null)
@@ -108,20 +105,15 @@ namespace Mochineko.AniSelfie
 
             mocopiReceiver.StopReceiving();
         }
-        
+
         [ContextMenu(nameof(CaptureImage))]
         public void CaptureImage()
         {
-            if (string.IsNullOrEmpty(capturedImageFilePath))
-            {
-                throw new ArgumentException(nameof(capturedImageFilePath));
-            }
-
-            CaptureImageAsync(capturedImageFilePath, this.GetCancellationTokenOnDestroy())
+            CaptureCameraAndSaveAsync(this.GetCancellationTokenOnDestroy())
                 .Forget();
         }
 
-        private async UniTask CaptureImageAsync(string path, CancellationToken cancellationToken)
+        private static async UniTask CaptureCameraAndSaveAsync(CancellationToken cancellationToken)
         {
             if (Camera.main == null)
             {
@@ -129,11 +121,32 @@ namespace Mochineko.AniSelfie
             }
 
             var capturedTexture = CameraCapture.Capture(Camera.main);
-            
+
             // TODO: Encode image on a thread pool.
             var encoded = ImageEncoder.Encode(capturedTexture);
+
+            var path = GetSavePath();
             
             await File.WriteAllBytesAsync(path, encoded, cancellationToken);
+            
+            Log.Info("[AniSelfie] Capture image saved to path:{0}.", path);
+        }
+
+        private static string GetSavePath()
+        {
+            var directory = Application.isEditor
+                ? Path.Combine(Application.dataPath, "/../Selfies/")
+                : Path.Combine(Application.dataPath, "/Selfies/");
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            var now = DateTime.Now;
+            var fileName =
+                $"AniSelfie_{now.Year:0000}{now.Month:00}{now.Day:00}_{now.Hour:00}{now.Minute:00}{now.Second:00}_{now.Millisecond:000}.png";
+
+            return Path.Combine(directory, fileName);
         }
     }
 }
