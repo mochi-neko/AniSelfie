@@ -160,7 +160,7 @@ Transform:
   m_Children:
   - {fileID: 3069772617647895889}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &386807211965642891
 MonoBehaviour:
@@ -232,4 +232,4 @@ MonoBehaviour:
   m_Width: 2
   m_Damping: 1
   m_MinFOV: 3
-  m_MaxFOV: 60
+  m_MaxFOV: 84.7
